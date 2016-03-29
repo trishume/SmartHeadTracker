@@ -1,0 +1,5 @@
+link_directories(/usr/local/lib)
+add_executable( SmartHeadTracker main.cpp)
+set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD 11)
+set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD_REQUIRED ON)
+target_link_libraries( SmartHeadTracker ${OpenCV_LIBS})
