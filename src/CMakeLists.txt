@@ -6,7 +6,7 @@ find_library(LIBUSB_LIBRARY_RAW NAMES usb)
 string(REPLACE "b." "b-1.0." LIBUSB_LIBRARY ${LIBUSB_LIBRARY_RAW})
 include_directories(${LIBUSB_INCLUDE_DIR} ${PS3_INCLUDE})
 
-add_executable( SmartHeadTracker main.cpp ${PS3_SOURCES})
+add_executable( SmartHeadTracker main.cpp markertracking.cpp ${PS3_SOURCES})
 set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD 11)
 set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries( SmartHeadTracker ${OpenCV_LIBS} ${LIBUSB_LIBRARY})

@@ -9,8 +9,10 @@
 #include <vector>
 #include <cstdint>
 
-#include "colorconv.h"
 #include "ps3eye.h"
+#include "colorconv.h"
+
+#include "markertracking.h"
 
 static const int kCaptureWidth = 640;
 static const int kCaptureHeight = 480;
@@ -29,6 +31,7 @@ int main() {
 
   PS3EYECam::PS3EYERef eye = devices.at(0);
   bool res = eye->init(kCaptureWidth, kCaptureHeight, kCaptureFPS);
+  if(!res) return 2;
   eye->start();
   eye->setAutoWhiteBalance(false);
   eye->setGain(10);
@@ -48,7 +51,7 @@ int main() {
 
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
-    imshow("main", cvFrame);
+    trackMarkers(cvFrame);
     int chr = waitKey(4);
     if(chr == 'q') break;
   }
