@@ -38,6 +38,7 @@ int main() {
   // eye->setRedBalance(0);
 
   namedWindow("main");
+  namedWindow("raw");
   // int trackVal1 = 10;
   // createTrackbar("val1","main",&trackVal1,255);
 
@@ -51,6 +52,7 @@ int main() {
 
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
+    imshow("raw",cvFrame);
     trackMarkers(cvFrame);
     int chr = waitKey(4);
     if(chr == 'q') break;
