@@ -30,6 +30,13 @@ int main() {
   PS3EYECam::PS3EYERef eye = devices.at(0);
   bool res = eye->init(kCaptureWidth, kCaptureHeight, kCaptureFPS);
   eye->start();
+  eye->setAutoWhiteBalance(false);
+  eye->setGain(10);
+  // eye->setRedBalance(0);
+
+  namedWindow("main");
+  // int trackVal1 = 10;
+  // createTrackbar("val1","main",&trackVal1,255);
 
   uint8_t *videoFrame  = new unsigned char[eye->getWidth()*eye->getHeight()*3];
   Mat cvFrame(Size(kCaptureWidth, kCaptureHeight), CV_8UC3, (void*)videoFrame);
@@ -38,6 +45,8 @@ int main() {
     uint8_t* new_pixels = eye->getFrame();
     yuv422_to_bgr(new_pixels, eye->getRowBytes(), videoFrame, eye->getWidth(),eye->getHeight());
     free(new_pixels);
+
+    // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
     imshow("main", cvFrame);
     int chr = waitKey(4);
