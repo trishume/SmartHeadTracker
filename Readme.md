@@ -29,4 +29,4 @@ There is some way to use CMake on Windows but I am not familiar with it.
 ## License
 
 This software is licensed under the MIT license (see the `LICENSE` file).
-However the PS3 Eye driver is released under a combination MIT/GPLv2 license because of its use of Linux kernel code.
+However the `PS3EYEDriver` submodule is released under a combination MIT/GPLv2 license because of its use of Linux kernel code.

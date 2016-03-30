@@ -6,12 +6,45 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <vector>
+#include <cstdint>
+
+#include "colorconv.h"
+#include "ps3eye.h"
 
 static const int kCaptureWidth = 640;
 static const int kCaptureHeight = 480;
 static const int kCaptureFPS = 60;
 
+using namespace ps3eye;
+using namespace cv;
+
 int main() {
-  std::cout << "lol test" << std::endl;
+  std::vector<PS3EYECam::PS3EYERef> devices( PS3EYECam::getDevices() );
+
+  if(devices.empty()) {
+    std::cerr << "No cameras found, can't run." << std::endl;
+    return 1;
+  }
+
+  PS3EYECam::PS3EYERef eye = devices.at(0);
+  bool res = eye->init(kCaptureWidth, kCaptureHeight, kCaptureFPS);
+  eye->start();
+
+  uint8_t *videoFrame  = new unsigned char[eye->getWidth()*eye->getHeight()*3];
+  Mat cvFrame(Size(kCaptureWidth, kCaptureHeight), CV_8UC3, (void*)videoFrame);
+
+  while(true) {
+    uint8_t* new_pixels = eye->getFrame();
+    yuv422_to_bgr(new_pixels, eye->getRowBytes(), videoFrame, eye->getWidth(),eye->getHeight());
+    free(new_pixels);
+
+    imshow("main", cvFrame);
+    int chr = waitKey(4);
+    if(chr == 'q') break;
+  }
+
+  if(eye) eye->stop();
+  delete[] videoFrame;
   return 0;
 }
