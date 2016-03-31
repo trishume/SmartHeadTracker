@@ -1,5 +1,5 @@
 PROJECT( SmartHeadTracker_project )
-FIND_PACKAGE( OpenCV REQUIRED )
+FIND_PACKAGE( OpenCV 3.0 REQUIRED HINTS /usr/local/Cellar/opencv3/3.1.0_1)
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
