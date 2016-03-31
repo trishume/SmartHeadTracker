@@ -13,6 +13,7 @@
 #include "colorconv.h"
 
 #include "markertracking.h"
+#include "server.h"
 
 static const int kCaptureWidth = 640;
 static const int kCaptureHeight = 480;
@@ -45,6 +46,8 @@ int main() {
   uint8_t *videoFrame  = new unsigned char[eye->getWidth()*eye->getHeight()*3];
   Mat cvFrame(Size(kCaptureWidth, kCaptureHeight), CV_8UC3, (void*)videoFrame);
 
+  Server server;
+
   while(true) {
     uint8_t* new_pixels = eye->getFrame();
     yuv422_to_bgr(new_pixels, eye->getRowBytes(), videoFrame, eye->getWidth(),eye->getHeight());
@@ -52,8 +55,11 @@ int main() {
 
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
-    imshow("raw",cvFrame);
-    trackMarkers(cvFrame);
+    // imshow("raw",cvFrame);
+    Point2f pt = trackMarkers(cvFrame);
+    if(pt.x != 0.0 || pt.y != 0.0)
+      server.send(kCaptureWidth - pt.x, pt.y);
+
     int chr = waitKey(4);
     if(chr == 'q') break;
   }

@@ -25,13 +25,13 @@ static void morphologicalClose(Mat &m) {
   erode(m,m,structuringEl);
 }
 
-static void findMarkerBlob(Mat &mask, Mat &origImage) {
+static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
   Mat labels, stats, centroids;
   connectedComponentsWithStats(mask, labels, stats, centroids, 8, CV_16U);
-  if(centroids.empty()) return;
   int maxIdx;
   Mat areas = stats.col(CC_STAT_AREA);
   areas.adjustROI(-1,0,0,0);
+  if(areas.empty()) return Point2f(0.0,0.0);
   minMaxIdx(areas, nullptr, nullptr, nullptr, &maxIdx);
   Point2f markerCenter(centroids.at<double>(maxIdx+1,0),centroids.at<double>(maxIdx+1,1));
   // std::cout << markerCenter << std::endl;
@@ -40,9 +40,11 @@ static void findMarkerBlob(Mat &mask, Mat &origImage) {
   line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
   line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
   imshow("main", origImage);
+
+  return markerCenter;
 }
 
-void trackMarkers(Mat &m) {
+Point2f trackMarkers(Mat &m) {
   FPixel target(0.35,0.4,1.0);
   FPixel target2(0.43,0.55,1.0);
   for (UPixel &p : cv::Mat_<UPixel>(m)) {
@@ -62,5 +64,5 @@ void trackMarkers(Mat &m) {
   morphologicalClose(mask);
   // imshow("mask",mask);
 
-  findMarkerBlob(mask, m);
+  return findMarkerBlob(mask, m);
 }

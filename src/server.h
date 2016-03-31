@@ -4,6 +4,11 @@
 
 #pragma once
 
-#include <opencv2/imgproc/imgproc.hpp>
+struct Server {
+  void *context;
+  void *publisher;
 
-cv::Point2f trackMarkers(cv::Mat &m);
+  Server();
+  ~Server();
+  void send(float x, float y);
+};
