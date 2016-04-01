@@ -60,7 +60,7 @@ int main() {
     if(pt.x != 0.0 || pt.y != 0.0)
       server.send(kCaptureWidth - pt.x, pt.y);
 
-    int chr = waitKey(4);
+    int chr = waitKey(1);
     if(chr == 'q') break;
   }
 

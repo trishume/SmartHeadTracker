@@ -9,14 +9,21 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#include <chrono>
 
 typedef cv::Point3_<uint8_t> UPixel;
 typedef cv::Point3_<float> FPixel;
+typedef cv::Point_<uint32_t> IPixel;
+
+static const int fixedMult = 10000;
+
 using namespace cv;
 
-float vecDist(FPixel a, FPixel b) {
-  FPixel diff = a - b;
-  return diff.x*diff.x + diff.y*diff.y + diff.z*diff.z;
+static inline uint32_t vecDist(UPixel *p, IPixel target) {
+  IPixel normalized(p->x*fixedMult/(p->z), p->y*fixedMult/(p->z));
+  uint32_t xDist = normalized.x - target.x;
+  uint32_t yDist = normalized.y - target.y;
+  return xDist*xDist + yDist*yDist;
 }
 
 static void morphologicalClose(Mat &m) {
@@ -37,25 +44,42 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
   // std::cout << markerCenter << std::endl;
 
   // circle(origImage, Point(markerCenter.x, markerCenter.y), 2, Scalar(255,255,255));
-  line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
-  line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
-  imshow("main", origImage);
+  // line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
+  // line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
+  // imshow("main", origImage);
 
   return markerCenter;
 }
 
-Point2f trackMarkers(Mat &m) {
-  FPixel target(0.35,0.4,1.0);
-  FPixel target2(0.43,0.55,1.0);
-  for (UPixel &p : cv::Mat_<UPixel>(m)) {
-    float maxc = std::max(p.x, std::max(p.y, p.z));
-    FPixel normalized(p.x / maxc, p.y / maxc, p.z / maxc);
-    float dist = std::min(vecDist(normalized,target),vecDist(normalized,target2));
-    p.x = 0;
-    p.y = (uint8_t)std::min(dist*3000.0f, 255.0f);
+static void colourDistances(Mat &m) {
+  IPixel target(0.35*fixedMult,0.4*fixedMult);
+  IPixel target2(0.43*fixedMult,0.55*fixedMult);
+  Size size = m.size();
+  for(int i = 0; i < size.height; i++) {
+    UPixel* row = m.ptr<UPixel>(i);
+    for(int j = 0; j < size.width; j++) {
+      UPixel *p = row+j;
+      if(p->z == 0) continue;
 
-    p.z = (p.y < 25 && maxc > 160) ? 255 : 0;
+      uint32_t dist1 = vecDist(p, target);
+      uint32_t dist2 = vecDist(p, target2);
+      uint32_t dist = std::min(dist1, dist2);
+
+      // p->x = 0;
+      // p->y = (uint8_t)std::min(dist / (fixedMult*10), 255U);
+      p->z = (dist < 70*fixedMult && p->z > 160) ? 255 : 0;
+    }
   }
+}
+
+Point2f trackMarkers(Mat &m) {
+  auto start = std::chrono::system_clock::now();
+
+  colourDistances(m);
+
+  auto end1 = std::chrono::system_clock::now();
+  auto elapsed1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start);
+  std::cout << elapsed1.count() << '\n';
 
   std::vector<Mat> rgb;
   split(m, rgb);
@@ -64,5 +88,11 @@ Point2f trackMarkers(Mat &m) {
   morphologicalClose(mask);
   // imshow("mask",mask);
 
-  return findMarkerBlob(mask, m);
+  Point2f res = findMarkerBlob(mask, m);
+
+  auto end = std::chrono::system_clock::now();
+  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << elapsed.count() << '\n';
+
+  return res;
 }
