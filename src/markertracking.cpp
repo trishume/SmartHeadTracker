@@ -19,8 +19,7 @@ static const int fixedMult = 10000;
 
 using namespace cv;
 
-static inline uint32_t vecDist(UPixel *p, IPixel target) {
-  IPixel normalized(p->x*fixedMult/(p->z), p->y*fixedMult/(p->z));
+static inline uint32_t vecDist(IPixel normalized, IPixel target) {
   uint32_t xDist = normalized.x - target.x;
   uint32_t yDist = normalized.y - target.y;
   return xDist*xDist + yDist*yDist;
@@ -41,9 +40,7 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
   if(areas.empty()) return Point2f(0.0,0.0);
   minMaxIdx(areas, nullptr, nullptr, nullptr, &maxIdx);
   Point2f markerCenter(centroids.at<double>(maxIdx+1,0),centroids.at<double>(maxIdx+1,1));
-  // std::cout << markerCenter << std::endl;
 
-  // circle(origImage, Point(markerCenter.x, markerCenter.y), 2, Scalar(255,255,255));
   // line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
   // line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
   // imshow("main", origImage);
@@ -61,8 +58,9 @@ static void colourDistances(Mat &m) {
       UPixel *p = row+j;
       if(p->z == 0) continue;
 
-      uint32_t dist1 = vecDist(p, target);
-      uint32_t dist2 = vecDist(p, target2);
+      IPixel normalized(p->x*fixedMult/(p->z), p->y*fixedMult/(p->z));
+      uint32_t dist1 = vecDist(normalized, target);
+      uint32_t dist2 = vecDist(normalized, target2);
       uint32_t dist = std::min(dist1, dist2);
 
       // p->x = 0;
