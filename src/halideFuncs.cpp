@@ -13,18 +13,32 @@ using namespace Halide;
 
 class ColourMatchGenerator {
 public:
-  static const uint32_t kFixedMult = 10000;
-  static const uint32_t kThresh = 70;
+  static const int kFixedMult = 10000;
+  static const int kThresh = 70;
   ImageParam input{UInt(8), 3, "input"};
-  Var x, y, c;
+  Var x, y, c, x2, y2;
 
   Func build() {
-    Tuple target = Tuple(0.35f*kFixedMult,0.4f*kFixedMult);
+    Tuple target = Tuple(cast<int>(0.35f*kFixedMult),cast<int>(0.4f*kFixedMult));
+    Tuple target2 = Tuple(cast<int>(0.43f*kFixedMult),cast<int>(0.55f*kFixedMult));
 
-    // Expr normalized =
+    Func vecDist;
+    Expr xDist = x - x2;
+    Expr yDist = y - y2;
+    vecDist(x, y, x2, y2) = xDist*xDist + yDist*yDist;
+
+    Func p;
+    p(x, y, c) = Halide::cast<int>(input(x,y,c));
+
+    Tuple normalized = Tuple(p(x,y,0)*kFixedMult/(p(x,y,2)+1), p(x,y,1)*kFixedMult/(p(x,y,2)+1));
+    Expr dist1 = vecDist(normalized[0],normalized[1],target[0],target[1]);
+    Expr dist2 = vecDist(normalized[0],normalized[1],target2[0],target2[1]);
+    Expr dist = min(dist1, dist2);
 
     Func out;
-    out(x, y) = select(cast<uint32_t>(input(x,y,2))*Expr(kFixedMult) > Expr(kThresh*kFixedMult), Halide::cast<uint8_t>(255), Halide::cast<uint8_t>(0));
+    out(x, y) = select(
+      dist < kThresh*kFixedMult && input(x,y,2) > 160, Halide::cast<uint8_t>(255),
+      Halide::cast<uint8_t>(0));
 
     out.vectorize(x, 4).parallel(y);
 

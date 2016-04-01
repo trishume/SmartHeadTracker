@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
+#include <chrono>
 
 #include "ps3eye.h"
 #include "colorconv.h"
@@ -17,7 +18,9 @@
 
 static const int kCaptureWidth = 640;
 static const int kCaptureHeight = 480;
-static const int kCaptureFPS = 60;
+// static const int kCaptureWidth = 320;
+// static const int kCaptureHeight = 240;
+static const int kCaptureFPS = 75;
 
 using namespace ps3eye;
 using namespace cv;
@@ -50,19 +53,24 @@ int main() {
   HalideGens *gens = createGens();
 
   while(true) {
+    auto start = std::chrono::system_clock::now();
     uint8_t* new_pixels = eye->getFrame();
     yuv422_to_bgr(new_pixels, eye->getRowBytes(), videoFrame, eye->getWidth(),eye->getHeight());
     free(new_pixels);
 
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
-    imshow("raw",cvFrame);
+    // imshow("raw",cvFrame);
     Point2f pt = trackMarkers(gens, cvFrame);
     if(pt.x != 0.0 || pt.y != 0.0)
       server.send(kCaptureWidth - pt.x, pt.y);
 
     int chr = waitKey(1);
     if(chr == 'q') break;
+
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "frame: " << elapsed.count() << '\n';
   }
 
   if(eye) eye->stop();
