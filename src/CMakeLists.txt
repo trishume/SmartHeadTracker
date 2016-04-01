@@ -7,11 +7,13 @@ string(REPLACE "b." "b-1.0." LIBUSB_LIBRARY ${LIBUSB_LIBRARY_RAW})
 
 find_path(ZMQ_INCLUDE_DIR NAMES zmq.h HINTS /usr/local/Cellar/zeromq/4.0.5_2/include)
 find_library(ZMQ_LIBRARY NAMES zmq HINTS /usr/local/Cellar/zeromq/4.0.5_2/lib)
-message(STATUS ${ZMQ_INCLUDE_DIR})
 
-include_directories(${LIBUSB_INCLUDE_DIR} ${ZMQ_INCLUDE_DIR} ${PS3_INCLUDE})
+find_path(HALIDE_INCLUDE_DIR Halide.h HINTS /usr/local/Cellar/halide/2015.10.22/include)
+find_library(HALIDE_LIBRARY Halide HINTS /usr/local/Cellar/halide/2015.10.22/lib)
 
-add_executable( SmartHeadTracker main.cpp markertracking.cpp server.cpp ${PS3_SOURCES})
+include_directories(${LIBUSB_INCLUDE_DIR} ${ZMQ_INCLUDE_DIR} ${PS3_INCLUDE} ${HALIDE_INCLUDE_DIR})
+
+add_executable( SmartHeadTracker main.cpp markertracking.cpp server.cpp halideFuncs.cpp ${PS3_SOURCES})
 set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD 11)
 set_property(TARGET SmartHeadTracker PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries( SmartHeadTracker ${OpenCV_LIBS} ${LIBUSB_LIBRARY} ${ZMQ_LIBRARY})
+target_link_libraries( SmartHeadTracker ${OpenCV_LIBS} ${LIBUSB_LIBRARY} ${ZMQ_LIBRARY} ${HALIDE_LIBRARY})

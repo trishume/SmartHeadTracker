@@ -6,4 +6,6 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-cv::Point2f trackMarkers(cv::Mat &m);
+#include "halideFuncs.h"
+
+cv::Point2f trackMarkers(HalideGens *gens, cv::Mat &m);

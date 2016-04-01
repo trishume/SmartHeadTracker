@@ -70,7 +70,8 @@ static void colourDistances(Mat &m) {
   }
 }
 
-Point2f trackMarkers(Mat &m) {
+Point2f trackMarkers(HalideGens *gens, Mat &m) {
+  Mat mask2 = colourMatchMask(gens, m);
   auto start = std::chrono::system_clock::now();
 
   colourDistances(m);
@@ -79,9 +80,12 @@ Point2f trackMarkers(Mat &m) {
   auto elapsed1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start);
   std::cout << elapsed1.count() << '\n';
 
+
   std::vector<Mat> rgb;
   split(m, rgb);
   Mat mask = rgb[2];
+
+  imshow("mask2", mask2);
 
   morphologicalClose(mask);
   // imshow("mask",mask);

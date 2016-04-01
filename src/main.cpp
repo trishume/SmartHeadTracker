@@ -47,6 +47,7 @@ int main() {
   Mat cvFrame(Size(kCaptureWidth, kCaptureHeight), CV_8UC3, (void*)videoFrame);
 
   Server server;
+  HalideGens *gens = createGens();
 
   while(true) {
     uint8_t* new_pixels = eye->getFrame();
@@ -55,8 +56,8 @@ int main() {
 
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
-    // imshow("raw",cvFrame);
-    Point2f pt = trackMarkers(cvFrame);
+    imshow("raw",cvFrame);
+    Point2f pt = trackMarkers(gens, cvFrame);
     if(pt.x != 0.0 || pt.y != 0.0)
       server.send(kCaptureWidth - pt.x, pt.y);
 
@@ -65,6 +66,7 @@ int main() {
   }
 
   if(eye) eye->stop();
+  deleteGens(gens);
   delete[] videoFrame;
   return 0;
 }
