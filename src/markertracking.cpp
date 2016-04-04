@@ -33,6 +33,13 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
   minMaxIdx(areas, nullptr, nullptr, nullptr, &maxIdx);
   Point2f markerCenter(centroids.at<double>(maxIdx+1,0),centroids.at<double>(maxIdx+1,1));
 
+  // Size s = origImage.size();
+  // Mat floodMask = Mat::zeros(Size(s.width+2,s.height+2), CV_8UC1);
+  // int lo = 50;
+  // int up = 60;
+  // floodFill(origImage, floodMask, Point(markerCenter.x,markerCenter.y), Scalar(0,0,255), nullptr,
+  //   Scalar(lo,lo,lo), Scalar(up,up,up), 4 | FLOODFILL_FIXED_RANGE);
+
   // line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
   // line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
   // imshow("main", origImage);
@@ -49,6 +56,7 @@ Point2f trackMarkers(HalideGens *gens, Mat &m) {
   // auto elapsed1 = std::chrono::duration_cast<std::chrono::microseconds>(end1 - start);
   // std::cout << "color: " << elapsed1.count() << '\n';
 
+  // imshow("mask orig",mask);
   morphologicalClose(mask);
   // imshow("mask",mask);
 
