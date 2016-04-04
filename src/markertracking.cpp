@@ -15,8 +15,6 @@ typedef cv::Point3_<uint8_t> UPixel;
 typedef cv::Point3_<float> FPixel;
 typedef cv::Point_<uint32_t> IPixel;
 
-static const int fixedMult = 10000;
-
 using namespace cv;
 
 static void morphologicalClose(Mat &m) {
@@ -46,6 +44,10 @@ Point2f trackMarkers(HalideGens *gens, Mat &m) {
   auto start = std::chrono::system_clock::now();
 
   Mat mask = colourMatchMask(gens, m);
+
+  // auto end1 = std::chrono::system_clock::now();
+  // auto elapsed1 = std::chrono::duration_cast<std::chrono::microseconds>(end1 - start);
+  // std::cout << "color: " << elapsed1.count() << '\n';
 
   morphologicalClose(mask);
   // imshow("mask",mask);
