@@ -4,9 +4,14 @@
 
 #pragma once
 
+#include "filters.h"
+
 struct Server {
   void *context;
   void *publisher;
+
+  one_euro_filter<> xFilt;
+  one_euro_filter<> yFilt;
 
   Server();
   ~Server();

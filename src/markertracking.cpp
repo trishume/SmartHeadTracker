@@ -48,11 +48,11 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
 }
 
 Point2f trackMarkers(HalideGens *gens, Mat &m) {
-  auto start = std::chrono::system_clock::now();
+  auto start = std::chrono::high_resolution_clock::now();
 
   Mat mask = colourMatchMask(gens, m);
 
-  // auto end1 = std::chrono::system_clock::now();
+  // auto end1 = std::chrono::high_resolution_clock::now();
   // auto elapsed1 = std::chrono::duration_cast<std::chrono::microseconds>(end1 - start);
   // std::cout << "color: " << elapsed1.count() << '\n';
 
@@ -62,7 +62,7 @@ Point2f trackMarkers(HalideGens *gens, Mat &m) {
 
   Point2f res = findMarkerBlob(mask, m);
 
-  auto end = std::chrono::system_clock::now();
+  auto end = std::chrono::high_resolution_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   std::cout << "vision: " << elapsed.count() << '\n';
 
