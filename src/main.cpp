@@ -51,6 +51,7 @@ int main() {
 
   Server server;
   HalideGens *gens = createGens();
+  bool showUI = false;
 
   while(true) {
     auto start = std::chrono::system_clock::now();
@@ -61,12 +62,13 @@ int main() {
     // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
 
     // imshow("raw",cvFrame);
-    Point2f pt = trackMarkers(gens, cvFrame);
+    Point2f pt = trackMarkers(gens, cvFrame, showUI);
     if(pt.x != 0.0 || pt.y != 0.0)
       server.send(kCaptureWidth - pt.x, pt.y);
 
     int chr = waitKey(1);
     if(chr == 'q') break;
+    else if(chr == 'u') showUI = !showUI;
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

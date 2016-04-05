@@ -8,4 +8,4 @@
 
 #include "halideFuncs.h"
 
-cv::Point2f trackMarkers(HalideGens *gens, cv::Mat &m);
+cv::Point2f trackMarkers(HalideGens *gens, cv::Mat &m, bool showUI);

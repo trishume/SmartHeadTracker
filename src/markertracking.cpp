@@ -23,7 +23,7 @@ static void morphologicalClose(Mat &m) {
   erode(m,m,structuringEl);
 }
 
-static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
+static Point2f findMarkerBlob(Mat &mask, Mat &origImage, bool showUI) {
   Mat labels, stats, centroids;
   connectedComponentsWithStats(mask, labels, stats, centroids, 8, CV_16U);
   int maxIdx;
@@ -40,14 +40,16 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage) {
   // floodFill(origImage, floodMask, Point(markerCenter.x,markerCenter.y), Scalar(0,0,255), nullptr,
   //   Scalar(lo,lo,lo), Scalar(up,up,up), 4 | FLOODFILL_FIXED_RANGE);
 
-  // line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
-  // line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
-  // imshow("main", origImage);
+  if(showUI) {
+    line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
+    line(origImage, Point(0, markerCenter.y), Point(origImage.size().width, markerCenter.y), Scalar(255,255,255));
+    imshow("main", origImage);
+  }
 
   return markerCenter;
 }
 
-Point2f trackMarkers(HalideGens *gens, Mat &m) {
+Point2f trackMarkers(HalideGens *gens, Mat &m, bool showUI) {
   auto start = std::chrono::high_resolution_clock::now();
 
   Mat mask = colourMatchMask(gens, m);
@@ -60,7 +62,7 @@ Point2f trackMarkers(HalideGens *gens, Mat &m) {
   morphologicalClose(mask);
   // imshow("mask",mask);
 
-  Point2f res = findMarkerBlob(mask, m);
+  Point2f res = findMarkerBlob(mask, m, showUI);
 
   auto end = std::chrono::high_resolution_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
