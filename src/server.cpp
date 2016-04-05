@@ -11,8 +11,8 @@
 #include <sys/time.h>
 
 static const int kMsgBufferSize = 250;
-static const double kFiltMinCutoff = 1.0;
-static const double kFiltBeta = 0.50;
+static const double kFiltMinCutoff = 3.0;
+static const double kFiltBeta = 10.00;
 
 static double sTicks() {
     struct timeval tv;
