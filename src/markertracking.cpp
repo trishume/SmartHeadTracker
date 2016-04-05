@@ -64,6 +64,7 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage, bool showUI) {
       }
     }
   }
+  if(pts.size() < 7) return Point2f(0.0,0.0);
   RotatedRect fittedEllipse = fitEllipse(pts);
   Point2f markerCenter = fittedEllipse.center;
 
