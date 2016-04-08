@@ -39,7 +39,6 @@ int main() {
   eye->start();
   eye->setAutoWhiteBalance(false);
   eye->setGain(10);
-  // eye->setRedBalance(0);
 
   namedWindow("main");
   namedWindow("raw");
@@ -59,7 +58,7 @@ int main() {
     yuv422_to_bgr(new_pixels, eye->getRowBytes(), videoFrame, eye->getWidth(),eye->getHeight());
     free(new_pixels);
 
-    // if(trackVal1 != eye->getExposure()) eye->setExposure(trackVal1);
+    // if(trackVal1 != eye->getRedBalance()) eye->setRedBalance(trackVal1);
 
     // imshow("raw",cvFrame);
     Point2f pt = trackMarkers(gens, cvFrame, showUI);

@@ -70,7 +70,7 @@ static Point2f findMarkerBlob(Mat &mask, Mat &origImage, bool showUI) {
 
   if(showUI) {
     // imshow("edges",detectedEdges);
-    // imshow("mask",labels);
+    // imshow("mask",mask);
     // imshow("intersect", intersect);
     ellipse(origImage, fittedEllipse, Scalar(0,255,0));
     line(origImage, Point(markerCenter.x, 0), Point(markerCenter.x, origImage.size().height), Scalar(255,255,255));
